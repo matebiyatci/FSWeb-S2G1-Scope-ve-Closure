@@ -30,10 +30,21 @@ console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin
   Aşağıdaki skor1 ve skor2 kodlarını inceleyiniz ve aşağıdaki soruları altına not alarak cevaplayın
   
   1. skor1 ve skor2 arasındaki fark nedir?
+
+CEVAP: skor1 fonksiyonu fonksiyon her çağrıldığında sıfırlandıktan sonra skoru 1 arttırırken, skor2 fonksiyonu
+o ana kadar yapılan tüm skorların toplamlarını vermektedir.
   
   2. Hangisi bir closure kullanmaktadır? Nasıl tarif edebilirsin? (yarınki derste öğreneceksin :) )
   
+CEVAP: skor1 kodlarında skorGuncelle fonksiyonu kendi scope'unda bulunmayan skor = 0 değerine erişmiş durumda.
+skor2 kodlarında ise skor2 fonksiyonu yine kendi scope'unda bulunmayan skor = 0 değerine erişebilmiş. Her 
+iki kodda da içeriden dışarıya erişim var. Dolayısıyla ikisi de closure kullanmış.
+
   3. Hangi durumda skor1 tercih edilebilir? Hangi durumda skor2 daha mantıklıdır?
+
+CEVAP: skor1 fonksiyonunu tek bir skoru görmek istediğimizde kullanabiliriz. skor2 fonksiyonunu ise tüm skorların
+toplamını görmek için kullanabiliriz.
+
 */
 
 // skor1 kodları
@@ -64,11 +75,9 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+function takimSkoru(){
+    return Math.floor(Math.random()*15) + 10;
 }
-
-
 
 
 /* Görev 3: macSonucu() 
@@ -86,8 +95,18 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
 }
 */ 
 
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+function macSonucu(takimSkoru, ceyrekSayisi){
+  let skorEvSahibi = 0;
+  let skorKonukTakim = 0;
+  for (let i = 0; i < ceyrekSayisi; i++) {
+    skorEvSahibi += takimSkoru();
+    skorKonukTakim += takimSkoru();
+  }
+  const sonuc = {
+    EvSahibi: skorEvSahibi,
+    KonukTakim: skorKonukTakim
+  };
+  return sonuc;
 }
 
 
@@ -109,8 +128,12 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function periyotSkoru(takimSkoru) {
+  const skorlar = {
+    EvSahibi: takimSkoru(),
+    KonukTakim: takimSkoru()
+  }
+  return skorlar;
 
 }
 
@@ -120,8 +143,10 @@ Aşağıdaki skorTabelasi() fonksiyonunu kullanarak aşağıdakileri yapınız:
   1. İlk parametre olarak Görev 4'te oluşturduğumuz 'periyotSkoru'nu bir değişken olarak almalı
   2. İkinci parametre olarak Gröev 2'de oluşturduğumuz 'takimSkoru'nu bir değişken olarak almalı
   3. Üçüncü parametre olarak da oynanacak olan çeyrek sayısını alın
-  4. Her bir çeyreğin sonucunu bir string olarak bir array içinde dönün. Aşadaki örnek gibi olmalı. Her çeyrekteki atılan sayıları ayrı ayrı yazmalı(toplam skoru değil!).
-  5. Eğer maç berabere biterse uzatmalar oynanmalı ve "Uzatma 1: Ev Sahibi 13 - Konuk Takım 11" eklemeli. (Her uzatma için ayrı ayrı eklemeli)
+  4. Her bir çeyreğin sonucunu bir string olarak bir array içinde dönün.
+  Aşadaki örnek gibi olmalı. Her çeyrekteki atılan sayıları ayrı ayrı yazmalı(toplam skoru değil!).
+  5. Eğer maç berabere biterse uzatmalar oynanmalı ve "Uzatma 1: Ev Sahibi 13 - Konuk Takım 11" eklemeli.
+  (Her uzatma için ayrı ayrı eklemeli)
   6. Maç bitince de final skoru yazmalı: "Maç Sonucu: Ev Sahibi 101 - Konuk Takım 98"
 
 MAÇ UZAMAZ ise skorTabelasi(periyotSkoru,takimSkoru,4)
@@ -146,10 +171,38 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
-}
+function skorTabelasi(periyotSkoru, takimSkoru, ceyrekSayisi) {
 
+  let sonuc = [];
+  let evSahibiToplam = 0;
+  let konukTakimToplam = 0;
+  let periyot;
+
+  for (let i = 0; i < ceyrekSayisi; i++) {
+
+    periyot = periyotSkoru(takimSkoru); // Bir periyot oynandı.
+    sonuc.push(`${i + 1}. Periyot: Ev Sahibi ${periyot.EvSahibi} - Konuk Takım ${periyot.KonukTakim}`);
+
+    evSahibiToplam += periyot.EvSahibi;
+    konukTakimToplam += periyot.KonukTakim;
+
+  }
+
+  let uzatmaSayaci = 0;
+  while (evSahibiToplam === konukTakimToplam) {
+
+    uzatmaSayaci++;
+    periyot = periyotSkoru(takimSkoru); 
+    sonuc.push(`${uzatmaSayaci}. Uzatma: Ev Sahibi ${periyot.EvSahibi} - Konuk Takım ${periyot.KonukTakim}`);
+
+    evSahibiToplam += periyot.EvSahibi;
+    konukTakimToplam += periyot.KonukTakim;
+  }
+
+  sonuc.push(`Maç Sonucu: Ev Sahibi ${evSahibiToplam} - Konuk Takım ${konukTakimToplam}`);
+  
+  return sonuc;
+}
 
 
 
